@@ -196,3 +196,5 @@ The island is constantly evolving and full of mysteries. As time passes and you 
 
 Happy hunting!
 
+Trello invite link:
+https://trello.com/b/k3xhKH4u/lambdamud-pedro-montesinos
