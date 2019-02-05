@@ -5,7 +5,14 @@ import axios from 'axios';
 const url = 'https://lambda-treasure-hunt.herokuapp.com/api/adv/init/'
 
 class App extends Component {
-  
+  state = {
+    room_id: 0,
+    coordinates: (60,60),
+    exits: [],
+    cooldown: 0,
+    graph: { 0: { "n": "?", "s": "?", "e": "?", "w": "?" } }
+
+  }
   componentDidMount(){
     this.init();
   }
