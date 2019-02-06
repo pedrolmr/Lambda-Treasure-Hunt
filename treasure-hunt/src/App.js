@@ -11,7 +11,7 @@ const config = {
 class App extends Component {
   state = {
     room_id: 0,
-    coordinates: {x: 60, y: 60},
+    coordinates: [],
     exits: [],
     cooldown: 0,
     reverseDirection: { "n": "s", "s": "n", "w": "e", "e": "w"},
@@ -23,6 +23,18 @@ class App extends Component {
     path:[]
   }
   componentDidMount(){
+    axios
+      .get(`${url}/init`, config)
+      .then(res => {
+        this.setState({
+          room_id: res.data.room_id,
+          coordinates: res.data.coordinates,
+          exits: res.data.exits,
+          cooldown: res.data.cooldown,
+          items: res.data.items,
+        });
+      })
+
     if(localStorage.hasOwnProperty('graph')){
       let localGraph = JSON.parse(localStorage.getItem('graph'));
       this.setState({graph: localGraph})
@@ -48,7 +60,11 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <h1>MAP!</h1>
+        <h1>{this.state.room_id}</h1>
+        <h1>{this.state.coordinates}</h1>
+        <h1>{this.state.exits}</h1>
+        <h1>{this.state.cooldown}</h1>
+        <h1>{this.state.items}</h1>
       </div>
     );
   }
