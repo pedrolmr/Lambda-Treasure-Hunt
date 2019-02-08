@@ -20,7 +20,8 @@ class App extends Component {
     storeInfo: null,
     curr_room: null,
     progress:0,
-    path:[]
+    path:[],
+    input: ''
   }
   componentDidMount(){
     axios
@@ -42,21 +43,23 @@ class App extends Component {
   }
 
   movePlayer = direction => {
-    const data = {direction: direction}
+    const data = { direction: direction }
     axios
       .post(`${url}/move`, data, config)
       .then(res => {
-        console.log(res.data)
-        if('room_id' in res.data){
-          this.setState({
-            curr_room: res.room_id,
-            exits: res.exits,
-            coordinates: res.coordinates,
-            cooldown: res.cooldown
-          })
-        }
+        this.setState({
+          curr_room: res.room_id,
+          exits: res.exits,
+          coordinates: res.coordinates,
+          cooldown: res.cooldown
+        })
+        console.log('curr_room:', this.state.curr_room);
       })
-  }
+  };
+  changeHandler = event => {
+    this.setState({ input: event.target.value });
+  };
+
   render() {
     return (
       <div className="App">
@@ -65,11 +68,10 @@ class App extends Component {
         <h1>{this.state.exits}</h1>
         <h1>{this.state.cooldown}</h1>
         <h1>{this.state.items}</h1>
+        <input type="text" name="input" value={this.changeHandler}/>
       </div>
     );
   }
 }
 
 export default App;
-
-// curl - X GET - H 'Authorization: Token [YOUR_API_KEY]' https://lambda-treasure-hunt.herokuapp.com/api/adv/init/
