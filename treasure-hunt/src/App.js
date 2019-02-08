@@ -56,10 +56,24 @@ class App extends Component {
         console.log('curr_room:', this.state.curr_room);
       })
   };
-  changeHandler = event => {
-    this.setState({ input: event.target.value });
-  };
 
+  enterDirection = event => {
+    event.preventDefault();
+    const move = { direction: this.state.input }
+    if (this.state.input === 'n' || this.state.input === 'e' || this.state.input === 'w' || this.state.input === 's'){
+      axios
+        .post(`${url}/move`, move, config)
+        .then(res => {
+          this.setState({
+            room_id: this.state.room_id,
+            coordinates: this.state.coordinates,
+            exits: this.state.exits,
+            items: this.state.items,
+            path: this.state.path.concat(this.state.input)                 
+          });
+        })
+    }
+  }
   render() {
     return (
       <div className="App">
@@ -68,7 +82,11 @@ class App extends Component {
         <h1>{this.state.exits}</h1>
         <h1>{this.state.cooldown}</h1>
         <h1>{this.state.items}</h1>
-        <input type="text" name="input" value={this.changeHandler}/>
+
+        <form onSubmit={this.move}>
+          <input type="text" value={this.state.data} onChange={this.movePlayer}/>
+          <button type='submit'>Submit</button>
+        </form>
       </div>
     );
   }
