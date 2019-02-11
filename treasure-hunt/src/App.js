@@ -14,7 +14,10 @@ class App extends Component {
     coordinates: [],
     exits: [],
     cooldown: 0,
-    reverseDirection: { "n": "s", "s": "n", "w": "e", "e": "w"},
+    title:'',
+    description:'',
+    messages: '',
+    reverseDirection: { 0: { n: "?", s: "?", e: "?", w: "?" } },
     graph: {},
     items:[],
     storeInfo: null,
@@ -23,6 +26,7 @@ class App extends Component {
     path:[],
     input: ''
   }
+
   componentDidMount(){
     axios
       .get(`${url}/init`, config)
