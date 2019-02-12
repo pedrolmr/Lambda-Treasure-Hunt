@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import data from './data.json';
-import map from './components/map';
+import Map from './components/map';
 import axios from 'axios';
 const url = 'https://lambda-treasure-hunt.herokuapp.com/api/adv';
 const config = {
@@ -138,6 +138,8 @@ class App extends Component {
           <input type="text" value={this.state.data} onChange={this.movePlayer}/>
           <button type='submit'>Submit</button>
         </form>
+
+        <Map />
       </div>
     );
   }

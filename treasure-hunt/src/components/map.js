@@ -1,18 +1,28 @@
 import React, { Component } from 'react';
-import data from '../data.json'
+import data from '../data.json';
+class Map extends Component {
+    state = {
+        graph: data,
+        coordinates: [],
+        edges: []
+    }
 
-const divs = ""
-const Map = () => {
-    return(
-        <div>
-            {data.map(roomId => {
-                const coordinates = data[roomId][0]
-                const exits = data[roomId][1]
-                const coordinates = [coordinates[0] - 45, 30 - (coordinates[1] - 45)]
+    nodes = () => {
+        const map = this.state.graph;
+        let coordinates = [];
+        for (let room in map) {
+            coordinates.push(map[room][0]);
+        }
+        this.setState({ coordinates: coordinates });
 
-                const style = ""
-            })}
-        </div>
-    )
+    };
+
+    render(){
+        return (
+            <div>
+                
+            </div>
+        )
+    }
 }
 export default Map;
