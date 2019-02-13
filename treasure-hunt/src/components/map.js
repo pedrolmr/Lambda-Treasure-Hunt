@@ -1,8 +1,28 @@
 import React, { Component } from 'react';
 
-import data from '../data.json'
+import data from '../data.json';
+import axios from 'axios';
+
+const url = 'https://lambda-treasure-hunt.herokuapp.com/api/adv';
+const config = {
+    headers: {
+        Authorization: `Token ${process.env.REACT_APP_API_KEY}`
+    }
+}
 
 class Map extends Component {
+    state = {
+        coordinates:[],
+        init:{}
+    }
+    componentDidMount(){
+        axios.get(`${url}/init`, config)
+            .then(response => {
+                this.setState({ init: response.data });
+                console.log('INIT!!', response.data);
+            })
+            .catch(error => console.log(error))
+    }
     createMap = () => {
         let graph = data
         let divs = ""
@@ -39,6 +59,42 @@ class Map extends Component {
         }
         return divs
     }
+    // createMap = () => {
+    //     let graph = data
+    //     let divs = ""
+    //     for (let roomID in graph) {
+    //         let coords = Object.values(graph[roomID][0])
+    //         let exits = Object.values(graph[roomID][1])
+
+    //         console.log('coordinates!!!!!!!', coords)
+    //         console.log('exits!!!!!!!', exits)
+
+    //         coords = [coords[0] - 45, coords[1] - 45]
+    //         let style = "position: 'absolute', display: 'block', width: '20px', height: '20px',"
+    //         style += "backgroundColor: 'gray', fontSize: '10px', color: 'black', textAlign: 'center', "
+    //         style += `left: '${coords[0] * 32}px', top: '${coords[1] * 32}px'`
+    //         let div = `<div style={{${style}}}>${roomID}</div>`
+    //         divs += div
+    //         for (let exit in exits) {
+    //             let exitStyles = "position: 'absolute', display: 'block', width: '6px', height: '30px', backgroundColor: 'black',"
+    //             if (exit === "n") {
+    //                 exitStyles += `left: '${coords[0] * 32 + 7}px', top: ${coords[1] * 32 - 6}px`
+    //             }
+    //             if (exit === "s") {
+    //                 exitStyles += `left: '${coords[0] * 32 + 7}px', top: ${coords[1] * 32 + 20}px`
+    //             }
+    //             if (exit === "e") {
+    //                 exitStyles += `left: '${coords[0] * 32 + 20}px', top: ${coords[1] * 32 + 7}px`
+    //             }
+    //             if (exit === "w") {
+    //                 exitStyles += `left: '${coords[0] * 32 - 6}px', top: ${coords[1] * 32 + 7}px`
+    //             }
+    //             div = `<div style={{${exitStyles}}}></div>`
+    //             divs += div
+    //         }
+    //     }
+    //     return divs
+    // }
 
     seeMap(event) {
         event.preventDefault()
