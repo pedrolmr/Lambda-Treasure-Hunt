@@ -47,7 +47,6 @@ class Map extends Component {
     }
     autoMove = (time, direction) => {
         let move = {'direction': direction}
-
         axios
             .post(`${url}/move`, move, config)
             .then(response => {
@@ -55,7 +54,35 @@ class Map extends Component {
                 this.setState({currRoom: response.data, graph})
                 console.log('move!!!!!:', this.state.currRoomInfo);
                 time();
-            }) 
+            }).catch(error => console.log(error));
+    }
+    move = (direction) => {
+        let move = { 'direction': direction }
+        axios
+            .post(`${url}/move`, move, config)
+            .then(response => {
+                let graph = this.localGraph(response.data.room_id, response.data.coordinates, response.data.exits)
+                this.setState({ currRoom: response.data, graph })
+                console.log('move!!!!!:', this.state.currRoomInfo);
+            }).catch(error => console.log(error));
+    }
+    async traversalAlgorithm(){
+        let traversal = [];
+        let backtrack = [];
+        let visited = {};
+        let timer = (time) => new Promise(resolve => setTimeout(resolve, time))
+        let move = (direction) => new Promise(resolve => this.autoMove(resolve, direction))
+
+        visited[this.state.currRoom.room_id] = this.state.currRoom.exits
+
+        while (Object.keys(visited).length < 499){
+            //todo
+            if(!this.state.currRoom.room_id in visited){
+                visited[this.state.currRoom.room_id] = this.state.currRoom.exits;
+
+                let last
+            }
+        }
     }
     createMap = () => {
         let graph = data
