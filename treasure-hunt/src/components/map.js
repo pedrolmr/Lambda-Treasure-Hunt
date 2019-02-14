@@ -78,9 +78,11 @@ class Map extends Component {
         while (Object.keys(visited).length < 499){
             //todo
             if(!this.state.currRoom.room_id in visited){
+                console.log('visted rooms length:', Object.keys(visited).length)
+                console.log('Tracking ->', visited);
                 visited[this.state.currRoom.room_id] = this.state.currRoom.exits;
 
-                let last
+                let last_value = backtrack[backtrack.length - 1]
             }
         }
     }
