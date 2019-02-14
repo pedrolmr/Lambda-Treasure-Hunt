@@ -66,24 +66,48 @@ class Map extends Component {
                 console.log('move!!!!!:', this.state.currRoomInfo);
             }).catch(error => console.log(error));
     }
+    inverse = (direction) => {
+        if(direction === "n"){
+            return "s"
+        }
+        else if(direction === "s"){
+            return "n"
+        }
+        else if(direction === "e"){
+            return "w"
+        }else if(direction === "w"){
+            return "e"
+        }
+    }
     async traversalAlgorithm(){
+        let visited = {};
+        visited[this.state.currRoom.room_id] = this.state.currRoom.exits
         let traversal = [];
         let backtrack = [];
-        let visited = {};
         let timer = (time) => new Promise(resolve => setTimeout(resolve, time))
         let move = (direction) => new Promise(resolve => this.autoMove(resolve, direction))
 
-        visited[this.state.currRoom.room_id] = this.state.currRoom.exits
-
         while (Object.keys(visited).length < 499){
-            //todo
-            if(!this.state.currRoom.room_id in visited){
+            if(!(this.state.currRoom.room_id in visited)){
                 console.log('visted rooms length:', Object.keys(visited).length)
                 console.log('Tracking ->', visited);
                 visited[this.state.currRoom.room_id] = this.state.currRoom.exits;
 
                 let last_value = backtrack[backtrack.length - 1]
+                let last_value_index = visited[this.state.currRoom.room_id].indexOf(last_value);
+                
+                delete visited[this.state.currRoom.room_id].splice(last_value_index, 1);
+            }while(visited[this.state.currRoom.room_id].length === 0 && backtrack.length > 0){
+                let backtrackDirection = backtrack.pop();
+                traversal.push(backtrackDirection)
+                await timer(this.state.currRoom.cooldown * 2000);
+                await move(backtrackDirection);
             }
+            let moves = visited[this.state.currRoom.room_id].shift();
+            traversal.push(moves)
+            backtrack.push(this.inverse(moves))
+            await timer(this.state.currRoom.cooldown * 2000);
+            await move(moves)
         }
     }
     createMap = () => {
