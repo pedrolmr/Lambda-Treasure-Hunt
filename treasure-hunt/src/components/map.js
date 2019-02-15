@@ -12,10 +12,9 @@ const config = {
 
 class Map extends Component {
     state = {
-        coordinates:[],
         currRoom: {},
         player: {},
-        graph: {}
+        graph: {} 
     }
     componentDidMount(){
         if (localStorage.hasOwnProperty('map')) {
@@ -26,9 +25,9 @@ class Map extends Component {
         axios.get(`${url}/init`, config)
             .then(response => {
                 this.setState({ currRoom: response.data });
-                console.log('INIT!!', response.data);
+                console.log('INIT!!', this.state.currRoom);
             })
-            .catch(error => console.log(error))
+            .catch(error => console.log('error:', error))
     }
     localGraph = (id, coordinates, exits) => {
         let graph = Object.assign({}, this.state.graph);
@@ -50,8 +49,8 @@ class Map extends Component {
         axios
             .post(`${url}/move`, explore, config)
             .then(response => {
-                let graph = this.localGraph(response.data.room_id, response.data.coordinates, response.data.exits)
-                this.setState({currRoom: response.data, graph})
+                let graph = this.localGraph(response.data.room_id, response.data.coordinates, response.data.exits);
+                this.setState({currRoom: response.data, graph});
                 console.log('move!!!!!:', this.state.currRoom);
                 time();
             }).catch(error => console.log(error));
@@ -61,8 +60,8 @@ class Map extends Component {
         axios
             .post(`${url}/move`, explore, config)
             .then(response => {
-                let graph = this.localGraph(response.data.room_id, response.data.coordinates, response.data.exits)
-                this.setState({ currRoom: response.data, graph })
+                let graph = this.localGraph(response.data.room_id, response.data.coordinates, response.data.exits);
+                this.setState({ currRoom: response.data, graph });
                 console.log('move!!!!!:', this.state.currRoom);
             }).catch(error => console.log(error));
     }
@@ -79,37 +78,74 @@ class Map extends Component {
             return "e"
         }
     }
+    getStatus = () => {
+        axios
+            .post(`${url}/status`, config)
+            .then(response => {
+                console.log(response.data);
+                this.setState(prevState => ({player: response.data}));
+                console.log("player name:", this.state.player.name)
+                console.log("cooldown:", this.state.player.cooldown)
+                console.log("gold:", this.state.player.gold)
+                console.log("inventory", this.state.player.inventory)
+            }).catch(error => console.log(error));
+    };
+
+    takeTreasure = (name, time) => {
+        let itemName = {name: name}
+        axios
+            .post(`${url}/take`, itemName, config)
+            .then(response => {
+                console.log(response.data);
+                this.setState({currRoom: response.data},
+                    time().then(() => this.getStatus())
+                );
+            })
+            .catch(error => console.log(error));
+    };
+
+    sellTreasure = name => {
+        let itemName = {name:name}
+        axios
+            .post(`${url}/sell`,itemName, config)
+            .then(response => {
+                console.log(response.data);
+                this.setState({ currRoom: response.data});
+            }).catch(error => console.log(error));
+    };
+
     async traversalAlgorithm(){
         let visited = {};
-        visited[this.state.currRoom.room_id] = this.state.currRoom.exits
+        visited[this.state.currRoom.room_id] = this.state.currRoom.exits;
         let traversal = [];
         let backtrack = [];
-        let timer = (time) => new Promise(resolve => setTimeout(resolve, time))
-        let move = (direction) => new Promise(resolve => this.autoMove(resolve, direction))
+        let timer = (time) => new Promise(resolve => setTimeout(resolve, time));
+        let move = (direction) => new Promise(resolve => this.autoMove(resolve, direction));
 
         while (Object.keys(visited).length < 500){
             if(!(this.state.currRoom.room_id in visited)){
-                console.log('visted rooms length:', Object.keys(visited).length)
+                console.log('visted rooms length:', Object.keys(visited).length);
                 console.log('Tracking ->', visited);
                 visited[this.state.currRoom.room_id] = this.state.currRoom.exits;
 
                 let last_value = backtrack[backtrack.length - 1]
                 let last_value_index = visited[this.state.currRoom.room_id].indexOf(last_value);
-                console.log('room visited:', visited)
+                console.log('room visited:', visited);
                 delete visited[this.state.currRoom.room_id].splice(last_value_index, 1);
-            }while(visited[this.state.currRoom.room_id].length === 0 && backtrack.length > 0){
+            }else if(visited[this.state.currRoom.room_id].length === 0 && backtrack.length > 0){
                 let backtrackDirection = backtrack.pop();
-                traversal.push(backtrackDirection)
+                traversal.push(backtrackDirection);
                 await timer(this.state.currRoom.cooldown * 2000);
-                console.log('second while loop..waiting for cooldown...')
+                console.log('second while loop..waiting for cooldown...');
                 await move(backtrackDirection);
+            }else{
+                let moves = visited[this.state.currRoom.room_id].shift();
+                traversal.push(moves);
+                backtrack.push(this.inverse(moves));
+                await timer(this.state.currRoom.cooldown * 2000);
+                console.log('waiting for cooldown...');
+                await move(moves)
             }
-            let moves = visited[this.state.currRoom.room_id].shift();
-            traversal.push(moves)
-            backtrack.push(this.inverse(moves))
-            await timer(this.state.currRoom.cooldown * 2000);
-            console.log('waiting for cooldown...')
-            await move(moves)
         }
         console.log('total rooms visited:', Object.keys(visited).length)
     }
@@ -132,11 +168,9 @@ class Map extends Component {
             for (let exit in exits) {
                 let exitStyles = "position: 'absolute', display: 'block', width: '6px', height: '6px', backgroundColor: 'black',"
                 if (exit === "n") {
-                    // exitStyles += `left: '${coords[0] * 32 + 7}px', top: '${coords[1] * 32 - 6}px'`
                     exitStyles += `left: '${coords[0] * 32 + 7}px', top: '${coords[1] * 32 + 20}px'`
                 }
                 if (exit === "s") {
-                    // exitStyles += `left: '${coords[0] * 32 + 7}px', top: '${coords[1] * 32 + 20}px'`
                     exitStyles += `left: '${coords[0] * 32 + 7}px', top: '${coords[1] * 32 - 6}px'`
                 }
                 if (exit === "e") {
