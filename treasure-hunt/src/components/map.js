@@ -14,7 +14,8 @@ class Map extends Component {
     state = {
         currRoom: {},
         player: {},
-        graph: {} 
+        graph: {}, 
+        square: {}
     }
     componentDidMount(){
         if (localStorage.hasOwnProperty('map')) {
@@ -132,7 +133,8 @@ class Map extends Component {
                 let last_value_index = visited[this.state.currRoom.room_id].indexOf(last_value);
                 console.log('room visited:', visited);
                 delete visited[this.state.currRoom.room_id].splice(last_value_index, 1);
-            }else if(visited[this.state.currRoom.room_id].length === 0 && backtrack.length > 0){
+
+            }else if (visited[this.state.currRoom.room_id].length === 0 && backtrack.length > 0) {
                 let backtrackDirection = backtrack.pop();
                 traversal.push(backtrackDirection);
                 await timer(this.state.currRoom.cooldown * 2000);
@@ -145,6 +147,7 @@ class Map extends Component {
                 await timer(this.state.currRoom.cooldown * 2000);
                 console.log('waiting for cooldown...');
                 await move(moves)
+                
             }
         }
         console.log('total rooms visited:', Object.keys(visited).length)
@@ -160,7 +163,7 @@ class Map extends Component {
             console.log('exits!!!!!!!', exits)
 
             coords = [coords[0] - 45, coords[1] - 45]
-            let style = "position: 'absolute', display: 'block', width: '20px', height: '20px',"
+            let style = "position: 'absolute',  display: 'block', width: '20px', height: '20px',"
             style += "backgroundColor: 'gray', fontSize: '10px', color: 'black', textAlign: 'center', "
             style += `left: '${coords[0] * 32}px', top: '${coords[1] * 32}px'`
             let div = `<div style={{${style}}}>${roomID}</div>`
@@ -194,6 +197,14 @@ class Map extends Component {
     render(){
         return(
             <React.Fragment>
+                <div className="menu">
+                    <p>Room ID:<strong>{this.state.currRoom.room_id}</strong></p>
+                    <p>Room Title:<strong>{this.state.currRoom.title}</strong></p>
+                    <p>Room description:<strong>{this.state.currRoom.description}</strong></p>
+                    <p>Players in the room:<strong>{this.state.currRoom.players}</strong></p>
+                    <p>Items in the room:<strong>{this.state.currRoom.items}</strong></p>
+                    <p>Your next exits are:<strong>{this.state.currRoom.exits}</strong></p>
+                </div>
                 <button onClick={(event) => this.seeMap(event)}>See map</button> 
                 <button onClick={() => this.move('w')}>West</button> 
                 <button onClick={() => this.move('n')}>North</button> 

@@ -14,3 +14,21 @@
   background-color:purple;
   border: 5px solid black;
 }
+.menu{
+  position:absolute;
+  right:0;
+  display: flex;
+  border:5px solid black;
+  width:300px;
+  flex-direction: column;
+}
+.square{
+  position: absolute;
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: blueviolet;
+  font-size: 10px;
+  color: white;
+  text-align: center;
+}
